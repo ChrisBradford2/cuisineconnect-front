@@ -22,7 +22,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
 
       - name: Cache pnpm and node_modules
         id: cache
@@ -59,7 +58,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
 
       - name: Restore Cached pnpm and node_modules
         uses: actions/cache@v2
