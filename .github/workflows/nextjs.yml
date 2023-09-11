@@ -13,22 +13,35 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [16.x, 18.x]
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install pnpm
-        run: npm install -g pnpm
-      - name: Setup pnpm cache
-        uses: actions/setup-node@v3
-        with:
           cache: 'pnpm'
+
+      - name: Cache pnpm and node_modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: ${{ runner.os }}-pnpm-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-${{ matrix.node-version }}-
+
+      - name: Install pnpm
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm install -g pnpm
+
       - name: Install Dependencies
         run: pnpm install
+
       - name: Build
         run: pnpm run build
 
@@ -37,20 +50,26 @@ jobs:
     needs: build
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [16.x, 18.x]
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install pnpm
-        run: npm install -g pnpm
-      - name: Setup pnpm cache
-        uses: actions/setup-node@v3
-        with:
           cache: 'pnpm'
-      - name: Install Dependencies
-        run: pnpm install
+
+      - name: Restore Cached pnpm and node_modules
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: ${{ runner.os }}-pnpm-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-${{ matrix.node-version }}-
+
       - name: Test
         run: pnpm run test
