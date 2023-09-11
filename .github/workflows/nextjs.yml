@@ -35,6 +35,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      matrix:
+        node-version: [18.x]
     steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Setup pnpm cache
+        uses: actions/setup-node@v3
+        with:
+          cache: 'pnpm'
+      - name: Install Dependencies
+        run: pnpm install
       - name: Test
         run: pnpm run test
