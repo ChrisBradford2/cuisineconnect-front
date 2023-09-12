@@ -23,6 +23,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm run build
+
       - name: Cache pnpm and node_modules
         id: cache
         uses: actions/cache@v2
@@ -33,15 +42,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-${{ matrix.node-version }}-
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm run build
 
   test:
     runs-on: ubuntu-latest
