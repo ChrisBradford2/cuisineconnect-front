@@ -21,7 +21,7 @@ export default function Home({ data, completionData }: any) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main
-        className={`min-h-screenitems-center p-24 ${inter.className}`}
+        className={`min-h-screen p-24 ${inter.className}`}
       >
         <h1 className="text-6xl font-bold text-center mb-6">
           Welcome to <a href="https://nextjs.org">Cuisine Connecté</a> !
