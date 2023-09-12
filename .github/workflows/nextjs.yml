@@ -11,37 +11,31 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x, 18.x]
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Install pnpm
-        run: npm install -g pnpm
+          node-version: 18.x
+          cache: 'npm'
 
       - name: Install Dependencies
-        run: pnpm install
+        run: npm ci
 
       - name: Build
-        run: pnpm run build
+        run: npm run build
 
-      - name: Cache pnpm and node_modules
+      - name: Cache build and node_modules
         id: cache
         uses: actions/cache@v2
         with:
           path: |
-            ~/.pnpm-store
             node_modules
-          key: ${{ runner.os }}-pnpm-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+            .next
+          key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-${{ matrix.node-version }}-
+            ${{ runner.os }}-build-
 
   test:
     runs-on: ubuntu-latest
@@ -53,25 +47,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install pnpm
-        run: npm install -g pnpm
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
   
       - name: Restore Cached pnpm and node_modules
         uses: actions/cache@v3
         with:
           path: |
-            ~/.pnpm-store
             node_modules
-          key: ${{ runner.os }}-pnpm-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+            .next
+          key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-${{ matrix.node-version }}-
+            ${{ runner.os }}-build-
 
       - name: Lint
-        run: pnpm run lint
+        run: npm run lint
 
       - name: Test
-        run: pnpm run test
+        run: npm test
