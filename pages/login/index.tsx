@@ -7,11 +7,20 @@ export default function Login() {
   const { data: session, status } = useSession()
 
   if (status === 'loading') {
-    return <p className="text-2xl text-center">Chargement...</p>
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen py-2">
+        <p className="text-2xl text-center">Chargement...</p>
+      </main>
+    )
   }
 
   if (session) {
-    return <p className="text-2xl text-center">Vous êtes déjà connecté, <a href="/" className='text-green-700 font-bold'>retournez à l'accueil</a></p>
+    router.push('/')
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen py-2">
+        <p className="text-2xl text-center">Vous êtes déjà connecté, <a href="/" className='text-green-700 font-bold'>retournez à l'accueil</a></p>
+      </main>
+    )
   }
   
   return (
