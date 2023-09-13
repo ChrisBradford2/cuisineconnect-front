@@ -1,6 +1,6 @@
+import { signOut, useSession } from 'next-auth/react';
 import { Inter } from 'next/font/google'
 import Head from 'next/head';
-import OpenAI from "openai";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,6 +13,7 @@ interface HomeProps {
 }
 
 export default function Home({ data, completionData }: any) {
+  const session = useSession();
   return (
     <>
       <Head>
@@ -24,14 +25,20 @@ export default function Home({ data, completionData }: any) {
         className={`min-h-screen p-24 ${inter.className}`}
       >
         <h1 className="text-6xl font-bold text-center mb-6">
-          Welcome to <a href="https://nextjs.org">Cuisine Connecté</a> !
+          Welcome to Cuisine Connecté&nbsp;!
         </h1>
-        <p className="text-2xl text-center">
-          Vous êtes connecté en tant que {data.name}.
-        </p>
-        <h2 className="text-2xl text-center">
-          Voici une blague : {completionData.joke}
-        </h2>
+        {session && session.data ? (
+          <>
+            <p className="text-2xl text-center">
+              Signed in as {session?.data?.user?.email} <br />
+            </p>
+            <div className='text-2xl text-center mt-6'>
+              <button className='text-green-700 font-bold' onClick={() => signOut()}>Logout</button>
+            </div>
+          </>
+        ) : (
+          <p className="text-2xl text-center">Pas encore connecté ? <a href="/login" className='text-green-700 font-bold'>Connectez-vous</a></p>
+        )}
       </main>
     </>
   )
@@ -40,15 +47,11 @@ export default function Home({ data, completionData }: any) {
 // Fetch data from internal API
 export async function getServerSideProps() {
   const response = await fetch('http://localhost:3000/api/hello')
-  const completion = await fetch('http://localhost:3000/api/completion')
   const data = await response.json()
-  const completionData = await completion.json()
   console.log(data)
-  console.log(completionData)
   return {
     props: {
-      data,
-      completionData
+      data
     }
   }
 }
