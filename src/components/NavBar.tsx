@@ -1,0 +1,32 @@
+import { FaHamburger, FaSearch } from "react-icons/fa";
+import Link from "next/link";
+
+export default function NavBar() {
+  return (
+    <main>
+    <nav className="bg-white shadow">
+      <div className="container px-6 py-3 mx-auto">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+              <div className="hidden md:block">
+                <div className="relative">
+                  <input type="text" className="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-1" placeholder="Search" />
+                  <button type="submit" className="absolute right-0 top-0 mt-3 mr-4">
+                    <FaSearch />
+                  </button>
+                </div>
+            <div className="flex md:hidden">
+              <button type="button" className="text-gray-500 hover:text-gray-600 focus:outline-none focus:text-gray-600" aria-label="toggle menu">
+                <FaHamburger />
+              </button>
+            </div>
+          </div>
+          <Link className="text-xl font-bold text-green-700 md:text-2xl hover:text-green-500 transition-all duration-150" href="/">Cuisine Connect</Link>
+          <div className="flex flex-col md:flex-row md:block -mx-2">
+            <Link className="px-2 py-1 text-gray-500 font-medium tracking-wide rounded-md hover:bg-green-100 hover:text-gray-700 transition-all duration-150" href="/login">Se connecter</Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </main>
+  )
+}

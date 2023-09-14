@@ -1,4 +1,5 @@
 import { signIn, useSession } from 'next-auth/react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 export default function Login() {
@@ -18,7 +19,7 @@ export default function Login() {
     router.push('/')
     return (
       <main className="flex flex-col items-center justify-center min-h-screen py-2">
-        <p className="text-2xl text-center">Vous êtes déjà connecté, <a href="/" className='text-green-700 font-bold'>retournez à l'accueil</a></p>
+        <p className="text-2xl text-center">Vous êtes déjà connecté, <Link href="/" className='text-green-700 font-bold'>retournez à l&apos;accueil</Link></p>
       </main>
     )
   }
