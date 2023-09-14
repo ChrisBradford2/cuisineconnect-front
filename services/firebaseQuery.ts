@@ -1,12 +1,18 @@
 import { admindb } from "./firebaseAdmin";
 
 export async function getAllRecipes() {
-  const querySnapshot = await admindb.collection('recipe').get();
-  const recipes = Array();
+  const querySnapshot = await admindb.collection('category').get();
 
-  querySnapshot.forEach(doc => {
-      recipes.push(doc.data());
-  });
+  const recipes = await Promise.all(querySnapshot.docs.map(async (doc) => {
+    const data = doc.data();
+
+    if (data.Test) {
+      const testDoc = await data.Test.get();
+      data.Test = testDoc.data();
+    }
+
+    return data;
+  }));
 
   return recipes;
 }
