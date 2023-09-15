@@ -1,24 +1,42 @@
 import { getSession, useSession } from "next-auth/react";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import React from "react";
 import { useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Profile ({ data, data2 }: any) {
   const session = useSession();
+  const router = useRouter();
 
   const [message, setMessage] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(session.data?.username || null);
   const [email, setEmail] = useState<string | null>(session.data?.user?.email || null);
+  const [password, setPassword] = useState<string | null>(null);
+  const [passwordConfirmation, setPasswordConfirmation] = useState<string | null>(null);
   const [selectedFood, setSelectedFood] = useState<string[]>(data?.food_preferences?.map((fp: any) => fp.id) || []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!username || !email) {
+      setMessage('Veuillez remplir les champs obligatoires');
+      return;
+    }
+
+    if (password !== passwordConfirmation) {
+      setMessage('Passwords do not match');
+      return;
+    }
+
     try {
       const response = await fetch(`http://localhost:1337/api/users/${session?.data?.id}`, {
         method: 'PUT',
         body: JSON.stringify({
           username : username,
           email : email,
+          password : password,
           food_preferences: selectedFood
         }),
         headers: {
@@ -30,9 +48,7 @@ export default function Profile ({ data, data2 }: any) {
       if (!response.ok) {
         throw new Error('Error updating profile');
       }
-
-      const responseData = await response.json();
-      console.log('Profile updated successfully!'); // ou utilisez responseData.message ou similaire selon la réponse de votre API
+      router.push('/profile');
 
     } catch (error: any) {
       setMessage(error.message);
@@ -57,7 +73,8 @@ export default function Profile ({ data, data2 }: any) {
             name="username" 
             value={username || ''}
             className="border border-gray-300 p-2 rounded w-64 focus:outline-none focus:border-blue-500" 
-            placeholder="Username"
+            placeholder="Username *"
+            required
             onChange={(e) => setUsername(e.target.value)}
         />
         
@@ -66,7 +83,8 @@ export default function Profile ({ data, data2 }: any) {
             name="email" 
             value={email || ''}
             className="border border-gray-300 p-2 rounded w-64 focus:outline-none focus:border-blue-500" 
-            placeholder="Email"
+            placeholder="Email *"
+            required
             onChange={(e) => setEmail(e.target.value)}
         />
         
@@ -84,6 +102,10 @@ export default function Profile ({ data, data2 }: any) {
                 <option key={fp.id} value={fp.id}>{fp.attributes.name}</option>
             ))}
         </select>
+
+        <input type="password" name="password" className="border border-gray-300 p-2 rounded w-64 focus:outline-none focus:border-blue-500" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+
+        <input type="password" name="password_confirmation" className="border border-gray-300 p-2 rounded w-64 focus:outline-none focus:border-blue-500" placeholder="Password confirmation" onChange={(e) => setPasswordConfirmation(e.target.value)} />
         
         <button 
             type="submit" 
@@ -92,6 +114,7 @@ export default function Profile ({ data, data2 }: any) {
             Submit
         </button>
     </form>
+    {message && <p className="text-red-500">{message}</p>}
 </section>
 
         )}
