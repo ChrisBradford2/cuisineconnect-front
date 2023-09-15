@@ -1,7 +1,8 @@
 import { getSession, useSession } from "next-auth/react"
 import Head from "next/head";
+import Link from "next/link";
 
-export default function Profile ({ data, data2 }: any) {
+export default function Profile ({ data }: any) {
   const session = useSession();
   return (
     <>
@@ -31,6 +32,7 @@ export default function Profile ({ data, data2 }: any) {
                       </p>
                     )
                   }
+                  <Link className="px-2 py-1 mt-4 text-green-700 font-medium tracking-wide rounded-md hover:bg-green-100 hover:text-gray-700 transition-all duration-150" href="/profile/edit">Modifier le profil</Link>
                 </div>
               </div>
             </div>
@@ -48,14 +50,14 @@ export async function getServerSideProps(context: any) {
   console.log(session)
 
   const headers = {
-    "Authorization": `Bearer ${process.env.STRAPI_API_KEY}`,
+    "Authorization": `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_KEY}`,
     'Content-Type': 'application/json',
   };
 
-  let data, data2;
+  let data;
 
   try {
-    const profileResponse = await fetch(`http://localhost:1337/api/users/${session?.id}?populate=food_preferences`, {
+    const profileResponse = await fetch(`http://localhost:1337/api/users/1?populate=food_preferences`, {
       method: 'GET',
       headers: headers,
     });
@@ -65,29 +67,13 @@ export async function getServerSideProps(context: any) {
     }
 
     data = await profileResponse.json();
-
-    const foodPreferencesResponse = await fetch('http://localhost:1337/api/food-preferences', {
-      method: 'GET',
-      headers: headers,
-    });
-
-    if (!foodPreferencesResponse.ok) {
-      throw new Error('Food preferences fetch failed');
-    }
-
-    data2 = await foodPreferencesResponse.json();
-  } catch (error) {
-    console.error(error);
-    // Vous pouvez renvoyer une erreur ou des données par défaut ici
-    return {
-      props: {},
-    };
+  } catch (e) {
+    console.log(e);
   }
 
   return {
     props: {
-      data,
-      data2: data2.data,
+      data
     },
   }
 }
