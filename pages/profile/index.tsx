@@ -1,9 +1,19 @@
 import { getSession, useSession } from "next-auth/react"
 import Head from "next/head";
 import Link from "next/link";
+import { useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Profile ({ data }: any) {
   const session = useSession();
+
+  useEffect(() => {
+    if (localStorage.getItem('profileUpdated')) {
+      toast.success('Profil mis à jour avec succès!');
+      localStorage.removeItem('profileUpdated');
+    }
+  }, []);
+
   return (
     <>
       <Head>
@@ -39,6 +49,7 @@ export default function Profile ({ data }: any) {
           </section>
         )}
       </main>
+      <ToastContainer />
     </>
   )
 }

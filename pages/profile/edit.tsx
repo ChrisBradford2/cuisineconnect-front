@@ -10,7 +10,6 @@ export default function Profile ({ data, data2 }: any) {
   const session = useSession();
   const router = useRouter();
 
-  const [message, setMessage] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(session.data?.username || null);
   const [email, setEmail] = useState<string | null>(session.data?.user?.email || null);
   const [password, setPassword] = useState<string | null>(null);
@@ -21,12 +20,12 @@ export default function Profile ({ data, data2 }: any) {
     e.preventDefault();
 
     if (!username || !email) {
-      setMessage('Veuillez remplir les champs obligatoires');
+      toast.error('Username and email are required');
       return;
     }
 
     if (password !== passwordConfirmation) {
-      setMessage('Passwords do not match');
+      toast.error('Passwords do not match');
       return;
     }
 
@@ -48,10 +47,12 @@ export default function Profile ({ data, data2 }: any) {
       if (!response.ok) {
         throw new Error('Error updating profile');
       }
+      localStorage.setItem('profileUpdated', 'true');
       router.push('/profile');
 
     } catch (error: any) {
-      setMessage(error.message);
+      console.log(error);
+      toast.error(error.message);
     }
   }
 
@@ -114,11 +115,21 @@ export default function Profile ({ data, data2 }: any) {
             Submit
         </button>
     </form>
-    {message && <p className="text-red-500">{message}</p>}
 </section>
-
         )}
       </main>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   )
 }
