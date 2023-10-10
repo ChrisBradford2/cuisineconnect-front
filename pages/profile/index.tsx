@@ -21,7 +21,7 @@ export default function Profile ({ data }: any) {
         <meta name="description" content="Cuisine Connecté" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex flex-col items-center min-h-screen">
+      <main className="flex flex-col mt-10 items-center min-h-screen">
         <h1 className="text-3xl font-bold text-gray-800 md:text-5xl">Profil</h1>
         {session.data && (
           // White card with user information
