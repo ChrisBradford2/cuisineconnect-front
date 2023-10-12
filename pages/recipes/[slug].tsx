@@ -1,13 +1,95 @@
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Markdown from 'react-markdown'
 import formatDate from '@/lib/formatDate';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import AddToFavoriteSVG from '@/components/AddToFavoriteSVG';
 
 export default function Recipe(recipe: any) {
+  const [isFavorite, setIsFavorite] = useState(false as boolean);
+  const [favoriteId, setFavoriteId] = useState(null as number | null);
+  const [userData, setUserData] = useState(null as any);
 
-  console.log(recipe);
+  const session = useSession();
+
+  const router = useRouter();
+  const { slug } = router.query
+  
+  useEffect(() => {
+    if (session.data) {
+      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me?populate=favorite_dishes.dish`, {
+          headers: {
+              'Authorization': `Bearer ${session.data.jwt}`
+          }
+      })
+      .then(response => {
+          setUserData(response.data);
+          console.log(response.data);
+          const favorite = response.data.favorite_dishes.find((fav: { dish: { id: number; }; }) => fav.dish.id === parseInt(slug as string));
+          console.log(favorite);
+          if (favorite) {
+              setIsFavorite(true);
+              setFavoriteId(favorite.id);
+          }
+      })
+      .catch(error => {
+          console.error("Error fetching user data:", error);
+      });
+    }
+  }, [slug]);
+  
+  function addToFavorites() {
+    if (session.data) {
+        console.log("ta mère la pute");
+        console.log(favoriteId);
+        const url = isFavorite ? 
+            `${process.env.NEXT_PUBLIC_API_URL}/api/favorite-dishes/${favoriteId}` :
+            `${process.env.NEXT_PUBLIC_API_URL}/api/favorite-dishes`;
+        const method = isFavorite ? 'DELETE' : 'POST';
+
+        axios({
+            method: method,
+            url: url,
+            headers: {
+                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_KEY}`
+            },
+            data: !isFavorite ? { data: { users_permissions_user: session.data.id, dish: parseInt(slug as string) } } : null
+        })
+        .then(response => {
+          if (method === 'POST') {
+              console.log("Added to favorites: ", response.data);
+              console.log("Response structure:", JSON.stringify(response.data, null, 2));
+              setIsFavorite(true);
+              const newFavoriteId = response.data && response.data.data && response.data.data.id ? response.data.data.id : null;
+              setFavoriteId(newFavoriteId);
+              console.log("Putain d'ID: ", newFavoriteId);
+          } else {
+              setIsFavorite(false);
+              setFavoriteId(null);
+          }
+      })
+        .catch(error => {
+            toast.error(error);
+        });
+    } else {
+        toast.error('Vous devez être connecté pour ajouter une recette à vos favoris');
+        console.error("You must be logged in to add a recipe to your favorites");
+    }
+  }
+
   return (
     <>
+      <Head>
+        <title>{recipe.recipe.attributes.title} | Recettes de cuisine</title>
+        <meta name="description" content={recipe.recipe.attributes.description} />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <main className="min-h-screen my-8">
         <div className="flex justify-around container mx-auto px-4">
           <div className="flex flex-col justify-center">
@@ -24,9 +106,25 @@ export default function Recipe(recipe: any) {
           </div>
           <div className="flex flex-col justify-between mt-8">
             <div className="flex flex-col justify-center">
-              <h1 className="text-3xl font-bold text-gray-800 md:text-5xl mb-4">
-                {recipe.recipe.attributes.title}
-              </h1>
+              <div className="flex flex-row justify-between mb-4">
+                <h1 className="text-3xl font-bold text-gray-800 md:text-5xl">
+                  {recipe.recipe.attributes.title}
+                </h1>
+                {session.data && (
+                  <button>
+                    <input
+                      type="checkbox"
+                      id="checkbox"
+                      checked={isFavorite}
+                      onChange={addToFavorites}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="checkbox">
+                      <AddToFavoriteSVG />
+                    </label>
+                  </button>
+                )}
+              </div>
               {/* Description */}
               <p className="text-base">
                 {recipe.recipe.attributes.description}
@@ -38,7 +136,7 @@ export default function Recipe(recipe: any) {
                 {recipe.recipe.attributes.categories.data.map(
                   (category: any) => (
                     <Link
-                      href="/recipes/pates" // @TODO: Change this to the correct link
+                      href="/recipes" // @TODO: Change this to the correct link
                       className="text-green-700 hover:text-green-500 transition-all duration-150"
                       key={category.id}
                     >
@@ -55,7 +153,7 @@ export default function Recipe(recipe: any) {
                 {recipe.recipe.attributes.food_preferences.data.map(
                   (food_preference: any) => (
                     <Link
-                      href="/recipes/pates" // @TODO: Change this to the correct link
+                      href="/recipes" // @TODO: Change this to the correct link
                       className="text-green-700 hover:text-green-500 transition-all duration-150"
                       key={food_preference.id}
                     >
@@ -118,10 +216,21 @@ export default function Recipe(recipe: any) {
             </div>
           </div>
       </main>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   );
 }
-
 
 export async function getServerSideProps(context: any) {
   // Fetch data from external API with auth token

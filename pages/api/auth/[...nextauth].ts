@@ -57,6 +57,9 @@ export const authOptions = {
       return Promise.resolve(token);
     },
   },
+  jwt: {
+    secret: "SECRET_KEY",
+  },
 }
 
 export default NextAuth(authOptions);
