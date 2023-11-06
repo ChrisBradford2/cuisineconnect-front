@@ -1,11 +1,27 @@
 import React, { useState } from 'react';
+import { GetServerSideProps } from 'next';
+import { Session } from 'next-auth';
 import { getSession, useSession } from 'next-auth/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function Profile({ data, foodPreferences }: any) {
+interface FoodPreference {
+  id: string;
+  attributes: {
+    name: string;
+  };
+}
+
+interface ProfileProps {
+  data: {
+    food_preferences?: FoodPreference[];
+  };
+  foodPreferences: FoodPreference[];
+}
+
+export default function Profile({ data, foodPreferences }: ProfileProps) {
   const session = useSession();
   const router = useRouter();
 
@@ -20,7 +36,7 @@ export default function Profile({ data, foodPreferences }: any) {
     string | null
   >(null);
   const [selectedFood, setSelectedFood] = useState<string[]>(
-    data?.food_preferences?.map((fp: any) => fp.id) || [],
+    data?.food_preferences?.map((foodPreference) => foodPreference.id) || [],
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,9 +85,12 @@ export default function Profile({ data, foodPreferences }: any) {
       }
       localStorage.setItem('profileUpdated', 'true');
       router.push('/profile');
-    } catch (error: any) {
-      console.log(error);
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('An unexpected error occurred');
+      }
     }
   };
 
@@ -123,9 +142,9 @@ export default function Profile({ data, foodPreferences }: any) {
                 }}
                 className="border border-gray-300 p-2 rounded w-64 focus:outline-none focus:border-blue-500"
               >
-                {foodPreferences.map((fp: any) => (
-                  <option key={fp.id} value={fp.id}>
-                    {fp.attributes.name}
+                {foodPreferences.map((foodPreference) => (
+                  <option key={foodPreference.id} value={foodPreference.id}>
+                    {foodPreference.attributes.name}
                   </option>
                 ))}
               </select>
@@ -172,7 +191,7 @@ export default function Profile({ data, foodPreferences }: any) {
   );
 }
 
-export async function getServerSideProps(context: any) {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
 
   const headers = {

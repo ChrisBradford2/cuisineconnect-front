@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 
@@ -35,8 +35,12 @@ export default function Register() {
         localStorage.setItem("firstTimeLogin", "true");
         setShowWelcomeMessage(true);
         router.push("/");
-    } catch (error: any) {
-      console.log(error.response.data.error.message);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.log(error?.response?.data.error.message);
+      } else {
+        console.log('An unexpected error occurred:', error);
+      }
     }
   };
   

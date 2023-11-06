@@ -1,10 +1,23 @@
 import { getSession, useSession } from "next-auth/react"
+import { GetServerSidePropsContext } from 'next'
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
-export default function Profile ({ data }: any) {
+interface FoodPreference {
+  id: string;
+  name: string;
+}
+
+interface ProfileData {
+  id: string;
+  username: string;
+  email: string;
+  food_preferences: FoodPreference[];
+}
+
+export default function Profile ({ data }: { data: ProfileData }) {
   const session = useSession();
 
   useEffect(() => {
@@ -34,7 +47,7 @@ export default function Profile ({ data }: any) {
                   {
                     data?.food_preferences?.length > 0 ? (
                       <p className="mt-2 text-sm text-gray-500 md:text-base">
-                        Food preference: {data.food_preferences.map((fp: any) => fp.name).join(', ')}
+                        Food preference: {data.food_preferences.map((foodPreference) => foodPreference.name).join(', ')}
                       </p>
                     ) : (
                       <p className="mt-2 text-sm text-gray-500 md:text-base">
@@ -54,7 +67,7 @@ export default function Profile ({ data }: any) {
   )
 }
 
-export async function getServerSideProps(context: any) {
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const session = await getSession(context);
 
   console.log('session')

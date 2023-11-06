@@ -1,23 +1,8 @@
 import Highlight from '@/src/components/Highlight';
-import { useSession } from 'next-auth/react';
-import { Inter } from 'next/font/google'
 import Head from 'next/head';
-import { getAllRecipes } from '@/services/firebaseQuery';
 import Image from 'next/image';
 
-const inter = Inter({ subsets: ['latin'] })
-
-interface UserData {
-  name: string;
-}
-
-interface HomeProps {
-  data: UserData;
-}
-
-export default function Home({ data }: HomeProps) {
-  const session = useSession();
-  console.log("dada", session);
+export default function Home() {
   return (
     <>
       <Head>
@@ -52,15 +37,4 @@ export default function Home({ data }: HomeProps) {
       </main>
     </>
   )
-}
-
-// Fetch data from internal API
-export const getServerSideProps = async (context: any) => {
-  const recipes = await getAllRecipes();
-
-  return {
-    props: {
-      data: recipes
-    }
-  }
 }

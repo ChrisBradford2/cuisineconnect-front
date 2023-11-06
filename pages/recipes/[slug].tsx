@@ -1,38 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Markdown from 'react-markdown'
-import formatDate from '@/lib/formatDate';
-import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import AddToFavoriteSVG from '@/components/AddToFavoriteSVG';
+import formatDate from '@/lib/formatDate';
+import { useSession } from 'next-auth/react';
+import Markdown from 'react-markdown'
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function Recipe(recipe: any) {
+
+// Fetch user data based on session token and slug.
+async function fetch_user_data(token: string, slug: string | string[] | undefined) {
+    try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me?populate=favorite_dishes.dish`, 
+                             { headers: {'Authorization': `Bearer ${token}`} });
+        const user_data = response.data;
+        const favorite = user_data.favorite_dishes.find((fav: { dish: { id: number; }; }) => fav.dish.id === parseInt(slug as string));
+        const is_favorite = Boolean(favorite);
+        const favorite_id = favorite ? favorite.id : null;
+        return [user_data, is_favorite, favorite_id];
+    } catch (e) {
+        console.error(`Error fetching user data: ${e}`);
+        return [null, false, null];
+    }
+}
+
+// Add or remove a dish from favorites.
+async function add_to_favorites(token: string, slug: string | string[] | undefined, is_favorite: boolean, favorite_id: number | null) {
+    const url = is_favorite ? `${process.env.NEXT_PUBLIC_API_URL}/api/favorite-dishes/${favorite_id}` : `${process.env.NEXT_PUBLIC_API_URL}/api/favorite-dishes`;
+    const method = is_favorite ? 'DELETE' : 'POST';
+    const data = !is_favorite ? { data: { users_permissions_user: session.data.id, dish: parseInt(slug as string) } } : null;
+    try {
+        const response = await axios({ method, url, headers: {'Authorization': `Bearer ${token}`}, data });
+        return response.data;
+    } catch (e) {
+        console.error(`Error updating favorites: ${e}`);
+        return null;
+    }
+}
+
+
+export default function Recipe({ recipe }: { recipe: any }) {
   const [isFavorite, setIsFavorite] = useState(false as boolean);
   const [favoriteId, setFavoriteId] = useState(null as number | null);
   const [userData, setUserData] = useState(null as any);
 
-  const session = useSession();
+  // Use the session from next-auth
+const session = useSession();
 
-  const router = useRouter();
+  // Use the router from next
+const router = useRouter();
   const { slug } = router.query
   
   useEffect(() => {
     if (session.data) {
-      axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me?populate=favorite_dishes.dish`, {
-          headers: {
-              'Authorization': `Bearer ${session.data.jwt}`
-          }
-      })
+      fetch_user_data(session.data.jwt, slug)
       .then(response => {
           setUserData(response.data);
-          console.log(response.data);
           const favorite = response.data.favorite_dishes.find((fav: { dish: { id: number; }; }) => fav.dish.id === parseInt(slug as string));
-          console.log(favorite);
           if (favorite) {
               setIsFavorite(true);
               setFavoriteId(favorite.id);
@@ -46,29 +74,18 @@ export default function Recipe(recipe: any) {
   
   function addToFavorites() {
     if (session.data) {
-        console.log("ta mère la pute");
-        console.log(favoriteId);
         const url = isFavorite ? 
             `${process.env.NEXT_PUBLIC_API_URL}/api/favorite-dishes/${favoriteId}` :
             `${process.env.NEXT_PUBLIC_API_URL}/api/favorite-dishes`;
         const method = isFavorite ? 'DELETE' : 'POST';
 
-        axios({
-            method: method,
-            url: url,
-            headers: {
-                'Authorization': `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_KEY}`
-            },
-            data: !isFavorite ? { data: { users_permissions_user: session.data.id, dish: parseInt(slug as string) } } : null
-        })
+        add_to_favorites(session.data.jwt, slug, isFavorite, favoriteId)
         .then(response => {
           if (method === 'POST') {
-              console.log("Added to favorites: ", response.data);
               console.log("Response structure:", JSON.stringify(response.data, null, 2));
               setIsFavorite(true);
               const newFavoriteId = response.data && response.data.data && response.data.data.id ? response.data.data.id : null;
               setFavoriteId(newFavoriteId);
-              console.log("Putain d'ID: ", newFavoriteId);
           } else {
               setIsFavorite(false);
               setFavoriteId(null);
@@ -242,8 +259,6 @@ export async function getServerSideProps(context: any) {
     },
   });
   const recipe = await res.json();
-
-  console.log(recipe);
 
   return {
     props: {

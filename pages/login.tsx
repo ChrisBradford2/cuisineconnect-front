@@ -1,3 +1,4 @@
+import { FormEvent } from 'react';
 import { signIn, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -24,12 +25,16 @@ export default function Login() {
     )
   }
 
-  const onSubmit = async (e : any) => {
+  const onSubmit = async (e : FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const target = e.target as typeof e.target & {
+      email: { value: string };
+      password: { value: string };
+    };
     const result = await signIn('credentials', {
       redirect: false,
-      email: e.target.email.value,
-      password: e.target.password.value,
+      email: target.email.value,
+      password: target.password.value,
     });
     if (result && result.ok) {
       router.replace('/');

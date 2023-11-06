@@ -1,7 +1,52 @@
 import Head from 'next/head';
 import RecipeCard from '@/src/components/RecipeCard';
 
-export default function Recipe({ recipe }: any) {
+interface Category {
+  id: number;
+  attributes: {
+    name: string;
+  };
+}
+
+interface FoodPreference {
+  id: number;
+  attributes: {
+    name: string;
+  };
+}
+
+interface RecipeImage {
+  id: number;
+  attributes: {
+    url: string;
+    alternativeText: string;
+  };
+}
+
+interface RecipeAttributes {
+  title: string;
+  description: string;
+  image: {
+    data: RecipeImage;
+  };
+  categories: {
+    data: Category[];
+  };
+  food_preferences: {
+    data: FoodPreference[];
+  };
+}
+
+interface RecipeData {
+  id: number;
+  attributes: RecipeAttributes;
+}
+
+interface RecipeProp {
+  data: RecipeData[];
+}
+
+export default function Recipe({ recipe }: { recipe: RecipeProp }) {
   console.log(recipe);
   return (
     <>
@@ -15,12 +60,28 @@ export default function Recipe({ recipe }: any) {
           Liste des recettes
         </h1>
         {/* Recipe list */}
-        {recipe.data.map((recipe: any) => (
+        {recipe.data.map((recipeItem) => (
           <section
             className="relative w-full container grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            key={recipe.id}
+            key={recipeItem.id}
           >
-            <RecipeCard slug={recipe.id} title={recipe.attributes.title} description={recipe.attributes.description} image={recipe.attributes.image.data.attributes.url} alt={recipe.attributes.image.data.attributes.alternativeText} category={recipe.attributes.categories.data.map((category: any) => category.attributes.name) as string[] } food_preferences={recipe.attributes.food_preferences.data.map((food_preference: any) => food_preference.attributes.name) as string[] } />
+            <RecipeCard
+              slug={recipeItem.id}
+              title={recipeItem.attributes.title}
+              description={recipeItem.attributes.description}
+              image={recipeItem.attributes.image.data.attributes.url}
+              alt={recipeItem.attributes.image.data.attributes.alternativeText}
+              category={
+                recipeItem.attributes.categories.data.map(
+                  (category) => category.attributes.name,
+                ) as string[]
+              }
+              food_preferences={
+                recipeItem.attributes.food_preferences.data.map(
+                  (food_preference) => food_preference.attributes.name,
+                ) as string[]
+              }
+            />
           </section>
         ))}
       </main>
@@ -29,12 +90,15 @@ export default function Recipe({ recipe }: any) {
 }
 
 export async function getServerSideProps() {
-  const res = await fetch(`http://localhost:1337/api/dishes?populate[]=image&populate[]=categories&populate[]=food_preferences`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_KEY}`,
+  const res = await fetch(
+    `{${process.env.NEXT_PUBLIC_API_URL}/api/dishes?populate[]=image&populate[]=categories&populate[]=food_preferences`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_KEY}`,
+      },
     },
-  });
+  );
   const recipe = await res.json();
   console.log(recipe);
 
