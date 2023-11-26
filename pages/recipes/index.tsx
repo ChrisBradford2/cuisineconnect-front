@@ -23,7 +23,7 @@ interface RecipeImage {
   };
 }
 
-interface RecipeAttributes {
+export interface RecipeAttributes {
   title: string;
   description: string;
   image: {
@@ -37,7 +37,7 @@ interface RecipeAttributes {
   };
 }
 
-interface RecipeData {
+export interface RecipeData {
   id: number;
   attributes: RecipeAttributes;
 }
@@ -47,7 +47,6 @@ interface RecipeProp {
 }
 
 export default function Recipe({ recipe }: { recipe: RecipeProp }) {
-  console.log(recipe);
   return (
     <>
       <Head>
@@ -55,10 +54,12 @@ export default function Recipe({ recipe }: { recipe: RecipeProp }) {
         <meta name="description" content="Cuisine Connecté" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <main className="min-h-screen container mx-auto px-4 my-8">
         <h1 className="text-3xl font-bold text-gray-800 md:text-5xl text-center mb-4">
           Liste des recettes
         </h1>
+
         {/* Recipe list */}
         {recipe.data.map((recipeItem) => (
           <section
@@ -71,16 +72,12 @@ export default function Recipe({ recipe }: { recipe: RecipeProp }) {
               description={recipeItem.attributes.description}
               image={recipeItem.attributes.image.data.attributes.url}
               alt={recipeItem.attributes.image.data.attributes.alternativeText}
-              category={
-                recipeItem.attributes.categories.data.map(
-                  (category) => category.attributes.name,
-                ) as string[]
-              }
-              food_preferences={
-                recipeItem.attributes.food_preferences.data.map(
-                  (food_preference) => food_preference.attributes.name,
-                ) as string[]
-              }
+              category={recipeItem.attributes.categories.data.map(
+                (category) => category.attributes.name,
+              )}
+              food_preferences={recipeItem.attributes.food_preferences.data.map(
+                (food_preference) => food_preference.attributes.name,
+              )}
             />
           </section>
         ))}
@@ -100,7 +97,6 @@ export async function getServerSideProps() {
     },
   );
   const recipe = await res.json();
-  console.log(recipe);
 
   return {
     props: {

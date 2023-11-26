@@ -1,7 +1,7 @@
 name: Bug Report
 description: Reporter un bug
-title: "[Bug]: "
-labels: ["bug"]
+title: '[Bug]: '
+labels: ['bug']
 body:
   - type: markdown
     attributes:

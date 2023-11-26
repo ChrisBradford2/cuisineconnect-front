@@ -1,14 +1,17 @@
-import '@/styles/globals.scss'
-import "@/styles/like.scss"
-import type { AppProps } from 'next/app'
-import { SessionProvider } from 'next-auth/react';
+import '@/styles/globals.scss';
+import '@/styles/like.scss';
+import type { AppProps } from 'next/app';
 import NavBar from '@/src/components/NavBar';
+import 'react-toastify/dist/ReactToastify.css';
 
-export default function App({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps) {
   return (
-    <SessionProvider session={session}>
+    <>
       <NavBar />
       <Component {...pageProps} />
-    </SessionProvider>
-  )
+    </>
+  );
 }

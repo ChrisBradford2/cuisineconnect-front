@@ -1,7 +1,25 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function RecipeCard({ slug, title, description, image, alt, category, food_preferences }: any) {
+type Props = {
+  slug: number;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+  category: string[];
+  food_preferences: string[];
+};
+
+export default function RecipeCard({
+  slug,
+  title,
+  description,
+  image,
+  alt,
+  category,
+  food_preferences,
+}: Props) {
   return (
     <div className="sm:max-w-md w-full mt-4 bg-white shadow-lg rounded-lg overflow-hidden">
       <Link href={`/recipes/${slug}`}>
@@ -13,11 +31,14 @@ export default function RecipeCard({ slug, title, description, image, alt, categ
           height={150}
         />
       </Link>
+
       <div className="p-4">
         <Link href={`/recipes/${slug}`}>
           <h1 className="text-xl font-semibold">{title}</h1>
         </Link>
+
         <p className="text-gray-600 mt-2 truncate">{description}</p>
+
         <div className="mt-3 flex items-center space-x-2">
           <Link
             href={'/'}
@@ -25,7 +46,8 @@ export default function RecipeCard({ slug, title, description, image, alt, categ
           >
             {category}
           </Link>
-          {food_preferences.map((food_preference: any) => (
+
+          {food_preferences.map((food_preference: string) => (
             <Link
               href={'/'}
               className="text-sm bg-green-200 text-green-800 py-1 px-2 rounded-full"

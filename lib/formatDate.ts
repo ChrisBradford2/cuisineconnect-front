@@ -2,29 +2,32 @@ export default function formatDate(input: Date | string): string {
   let date: Date;
 
   if (typeof input === 'string') {
-      date = new Date(input);
+    date = new Date(input);
   } else if (input instanceof Date) {
-      date = input;
+    date = input;
   } else {
-      throw new TypeError('Invalid date provided');
+    throw new TypeError('Invalid date provided');
   }
 
   const dateOptions: Intl.DateTimeFormatOptions = {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   };
 
   const timeOptions: Intl.DateTimeFormatOptions = {
-      hour: 'numeric',
-      minute: 'numeric'
+    hour: 'numeric',
+    minute: 'numeric',
   };
 
-  const formattedDate = date.toLocaleDateString('fr-FR', dateOptions)
-                           .split(' ')
-                           .map((word, index) => index === 0 || index === 2 ? capitalizeFirstLetter(word) : word)
-                           .join(' ');
+  const formattedDate = date
+    .toLocaleDateString('fr-FR', dateOptions)
+    .split(' ')
+    .map((word, index) =>
+      index === 0 || index === 2 ? capitalizeFirstLetter(word) : word,
+    )
+    .join(' ');
 
   const formattedTime = date.toLocaleTimeString('fr-FR', timeOptions);
 
