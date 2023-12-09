@@ -1,52 +1,18 @@
 import Head from 'next/head';
+import { db } from '@/services/model';
 import RecipeCard from '@/src/components/RecipeCard';
 
-interface Category {
+type Recipe = {
   id: number;
-  attributes: {
-    name: string;
-  };
-}
-
-interface FoodPreference {
-  id: number;
-  attributes: {
-    name: string;
-  };
-}
-
-interface RecipeImage {
-  id: number;
-  attributes: {
-    url: string;
-    alternativeText: string;
-  };
-}
-
-export interface RecipeAttributes {
   title: string;
-  description: string;
-  image: {
-    data: RecipeImage;
-  };
-  categories: {
-    data: Category[];
-  };
-  food_preferences: {
-    data: FoodPreference[];
-  };
-}
+  content: string;
+};
 
-export interface RecipeData {
-  id: number;
-  attributes: RecipeAttributes;
-}
+type Props = {
+  recipes: Recipe[];
+};
 
-interface RecipeProp {
-  data: RecipeData[];
-}
-
-export default function Recipe({ recipe }: { recipe: RecipeProp }) {
+export default function Recipe({ recipes }: Props) {
   return (
     <>
       <Head>
@@ -60,47 +26,41 @@ export default function Recipe({ recipe }: { recipe: RecipeProp }) {
           Liste des recettes
         </h1>
 
-        {/* Recipe list */}
-        {recipe.data.map((recipeItem) => (
-          <section
-            className="relative w-full container grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
-            key={recipeItem.id}
-          >
-            <RecipeCard
-              slug={recipeItem.id}
-              title={recipeItem.attributes.title}
-              description={recipeItem.attributes.description}
-              image={recipeItem.attributes.image.data.attributes.url}
-              alt={recipeItem.attributes.image.data.attributes.alternativeText}
-              category={recipeItem.attributes.categories.data.map(
-                (category) => category.attributes.name,
-              )}
-              food_preferences={recipeItem.attributes.food_preferences.data.map(
-                (food_preference) => food_preference.attributes.name,
-              )}
-            />
-          </section>
-        ))}
+        {recipes.map((recipe) => {
+          return (
+            <section
+              className="relative w-full container grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+              key={recipe.id}
+            >
+              {/*// @ts-ignore*/}
+              <pre>{JSON.stringify(recipe, ' ', 2)}</pre>
+              <RecipeCard
+                slug={recipe.id}
+                title={recipe.title}
+                description={recipe.content}
+                image={''}
+                alt={recipe.title}
+              />
+            </section>
+          );
+        })}
       </main>
     </>
   );
 }
 
 export async function getServerSideProps() {
-  const res = await fetch(
-    `{${process.env.NEXT_PUBLIC_API_URL}/api/dishes?populate[]=image&populate[]=categories&populate[]=food_preferences`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_API_KEY}`,
-      },
-    },
-  );
-  const recipe = await res.json();
+  const dbRecipes = await db.Recipe.findAll();
+
+  const recipes: Recipe[] = dbRecipes.map((recipe) => ({
+    id: recipe.id,
+    content: recipe.content,
+    title: recipe.title,
+  }));
 
   return {
     props: {
-      recipe,
+      recipes,
     },
   };
 }
