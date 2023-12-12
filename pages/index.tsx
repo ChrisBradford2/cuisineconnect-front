@@ -1,18 +1,8 @@
-import { Inter } from 'next/font/google'
+import Highlight from '@/src/components/Highlight';
 import Head from 'next/head';
-import OpenAI from "openai";
+import Image from 'next/image';
 
-const inter = Inter({ subsets: ['latin'] })
-
-interface UserData {
-  name: string;
-}
-
-interface HomeProps {
-  data: UserData;
-}
-
-export default function Home({ data, completionData }: any) {
+export default function Home() {
   return (
     <>
       <Head>
@@ -20,35 +10,61 @@ export default function Home({ data, completionData }: any) {
         <meta name="description" content="Cuisine Connecté" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main
-        className={`min-h-screenitems-center p-24 ${inter.className}`}
-      >
-        <h1 className="text-6xl font-bold text-center mb-6">
-          Welcome to <a href="https://nextjs.org">Cuisine Connecté</a> !
-        </h1>
-        <p className="text-2xl text-center">
-          Vous êtes connecté en tant que {data.name}.
-        </p>
-        <h2 className="text-2xl text-center">
-          Voici une blague : {completionData.joke}
-        </h2>
+
+      <main className="flex flex-col items-center min-h-screen">
+        {/* Hero image */}
+        <section className="relative flex flex-col items-center justify-center w-full bg-gray-100">
+          <div className="absolute inset-0 z-0 w-full h-full bg-gray-100">
+            <Image
+              className="object-cover object-center w-full h-full"
+              src="/1000_F_192008586_6VI1Y9joXyCGDgonO9DJbyHE8bzrBDM7.jpg"
+              alt="hero"
+              layout="fill"
+            />
+
+            <div className="absolute inset-0 z-10 w-full h-full bg-black opacity-25"></div>
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center justify-center w-full h-full p-10 mx-auto my-0 text-center bg-white rounded-lg shadow-2xl md:my-32 md:w-1/2">
+            <h1 className="text-3xl font-bold text-gray-800 md:text-5xl">
+              Cuisine Connecté
+            </h1>
+
+            <p className="mt-2 text-sm text-gray-500 md:text-base">
+              Cuisine Connecté est une application web qui vous permet de gérer
+              vos recettes de cuisine.
+            </p>
+
+            <button className="px-4 py-2 mt-6 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-green-700 rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600">
+              Découvrir
+            </button>
+          </div>
+        </section>
+
+        {/* Features section */}
+        <section className="relative flex flex-col items-center justify-center w-full py-16">
+          <div className="container flex flex-col items-center justify-center">
+            <h2 className="text-3xl font-bold text-center text-green-700 md:text-5xl">
+              Lumière sur nos recettes
+            </h2>
+
+            <div className="flex items-center mt-8 w-full justify-evenly">
+              <Highlight image="/pates.jpg" alt="Plat de pâtes" title="Pâtes" />
+              <Highlight
+                image="/salade.jpg"
+                alt="Plat de salade"
+                title="Salades"
+              />
+
+              <Highlight
+                image="/dessert.jpg"
+                alt="Présentation de Tiramistu"
+                title="Desserts"
+              />
+            </div>
+          </div>
+        </section>
       </main>
     </>
-  )
-}
-
-// Fetch data from internal API
-export async function getServerSideProps() {
-  const response = await fetch('http://localhost:3000/api/hello')
-  const completion = await fetch('http://localhost:3000/api/completion')
-  const data = await response.json()
-  const completionData = await completion.json()
-  console.log(data)
-  console.log(completionData)
-  return {
-    props: {
-      data,
-      completionData
-    }
-  }
+  );
 }
