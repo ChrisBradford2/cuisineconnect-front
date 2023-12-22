@@ -2,10 +2,32 @@ import { FaHamburger, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import useSession from '@/src/hooks/useSession';
 import useIsClient from '@/src/hooks/useIsClient';
+import { useState } from "react";
+import Router from 'next/router'
+
+
+
+export async function search(system: string, prompt: string): Promise<string> {
+  const response = await fetch("/api/completion", {
+    method: "POST",
+    body: JSON.stringify([
+      {
+        role: "system",
+        content: system,
+      },
+      { role: "user", content: prompt },
+    ]),
+  });
+  const json = await response.json();
+  return json.content;
+}
 
 export default function NavBar() {
   const session = useSession();
   const isClient = useIsClient();
+
+  const [error, setError] = useState<unknown | null>(null);
+  const [recipes, setRecipes] = useState<string[]>([]);
 
   return (
     <main>
@@ -13,20 +35,31 @@ export default function NavBar() {
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div className="hidden md:block">
-              <div className="relative">
-                <input
-                  type="text"
-                  className="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-1 focus:outline-green-700"
-                  placeholder="Search"
-                />
-
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 mt-3 mr-4 transition-opacity duration-500 opacity-100 focus-within:opacity-0"
-                >
-                  <FaSearch />
-                </button>
-              </div>
+              <form
+                  className="flex"
+                  onSubmit={async (event) => {
+                    event.preventDefault();
+                    const formData = new FormData(event.currentTarget);
+                    try {
+                      const content = await search(
+                          "Give a formatted list of recipes that matches the user's request. Follow the following sample formatting:\n - Recipe 1\n - Recipe 2",
+                          String(formData.get("content")),
+                      );
+                      setRecipes(
+                          content.split("\n").map((line) => line.replace(/ *- */g, "")),
+                      );
+                      await Router.push({
+                        pathname: '/recipes',
+                        query: {recipes: recipes}
+                      })
+                    } catch (e) {
+                      setError(e);
+                    }
+                  }}
+              >
+                <input name="content" placeholder="I want recipes of…" />
+                <button>Search</button>
+              </form>
 
               <div className="flex md:hidden">
                 <button
