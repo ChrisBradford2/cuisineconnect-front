@@ -5,29 +5,29 @@ import useIsClient from '@/src/hooks/useIsClient';
 import { useState } from "react";
 import Router from 'next/router'
 
-
-
-export async function search(system: string, prompt: string): Promise<string> {
-  const response = await fetch("/api/completion", {
-    method: "POST",
-    body: JSON.stringify([
-      {
-        role: "system",
-        content: system,
-      },
-      { role: "user", content: prompt },
-    ]),
-  });
-  const json = await response.json();
-  return json.content;
-}
-
 export default function NavBar() {
   const session = useSession();
   const isClient = useIsClient();
 
   const [error, setError] = useState<unknown | null>(null);
-  const [recipes, setRecipes] = useState<string[]>([]);
+
+  const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const content = String(formData.get("content"));
+
+    // Effacez le stockage local avant de faire une nouvelle recherche
+    localStorage.removeItem('recipes');
+
+    try {
+      await Router.push({
+        pathname: '/recipes',
+        query: { content: content }
+      });
+    } catch (e) {
+      setError(e);
+    }
+  };
 
   return (
     <main>
@@ -36,30 +36,12 @@ export default function NavBar() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div className="hidden md:block">
               <form
-                  className="flex"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    const formData = new FormData(event.currentTarget);
-                    try {
-                      const content = await search(
-                          "Give a formatted list of recipes that matches the user's request. Follow the following sample formatting:\n - Recipe 1\n - Recipe 2",
-                          String(formData.get("content")),
-                      );
-                      setRecipes(
-                          content.split("\n").map((line) => line.replace(/ *- */g, "")),
-                      );
-                      await Router.push({
-                        pathname: '/recipes',
-                        query: {recipes: recipes}
-                      })
-                    } catch (e) {
-                      setError(e);
-                    }
-                  }}
-              >
-                <input name="content" placeholder="I want recipes of…" />
-                <button>Search</button>
-              </form>
+                className="flex"
+                onSubmit={handleSearchSubmit}
+                >
+              <input name="content" placeholder="I want recipes of…" />
+              <button type="submit">Search</button>
+            </form>
 
               <div className="flex md:hidden">
                 <button
