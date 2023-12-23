@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react'; // Modification: Import de useEffect
+import { useState, useEffect } from 'react';
 import Router, { useRouter } from 'next/router';
 import { search } from '@/src/utils';
 

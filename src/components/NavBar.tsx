@@ -18,7 +18,6 @@ export default function NavBar() {
     const formData = new FormData(event.currentTarget);
     const content = String(formData.get('content'));
 
-    // Effacez le stockage local avant de faire une nouvelle recherche
     localStorage.removeItem('recipes');
 
     try {
