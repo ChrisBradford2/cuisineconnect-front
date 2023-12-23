@@ -24,7 +24,7 @@ export default function Register() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <main className="flex flex-col items-center mt-10 w-full flex-1 px-20 text-center">
-        <h1 className="text-6xl font-bold">S'inscrire</h1>
+        <h1 className="text-6xl font-bold">S&rsquo;inscrire</h1>
 
         <p className="mt-3 text-2xl">
           Inscrivez-vous pour accéder à la plateforme
@@ -56,7 +56,7 @@ export default function Register() {
             className="w-full px-6 py-3 mt-3 text-lg text-white transition-all duration-150 ease-linear bg-blue-600 rounded-lg shadow outline-none hover:bg-blue-700 hover:shadow-lg focus:outline-none"
             type="submit"
           >
-            S'inscrire
+            S&rsquo;inscrire
           </button>
         </form>
       </main>
