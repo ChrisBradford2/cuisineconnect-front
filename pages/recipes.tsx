@@ -13,26 +13,23 @@ export async function getRecipes(content: string) {
   return recipes;
 }
 
-export default function Home() {
+export default function Recipes() {
   const router = useRouter();
   const [recipes, setRecipes] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (router.query.content) {
-        const cachedRecipes = localStorage.getItem('recipes');
-        if (cachedRecipes) {
-          setRecipes(JSON.parse(cachedRecipes));
-        } else {
-          const fetchedRecipes = await getRecipes(String(router.query.content));
+    if (router.query.search) {
+      const cachedRecipes = localStorage.getItem('recipes');
+      if (cachedRecipes) {
+        setRecipes(JSON.parse(cachedRecipes));
+      } else {
+        getRecipes(String(router.query.search)).then((fetchedRecipes) => {
           setRecipes(fetchedRecipes);
           localStorage.setItem('recipes', JSON.stringify(fetchedRecipes));
-        }
+        });
       }
-    };
-
-    fetchData();
-  }, [router.query.content]);
+    }
+  }, [router.query.search]);
 
   return (
     <>

@@ -16,14 +16,14 @@ export default function NavBar() {
   ) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const content = String(formData.get('content'));
+    const search = String(formData.get('content'));
 
     localStorage.removeItem('recipes');
 
     try {
       await Router.push({
         pathname: '/recipes',
-        query: { content: content },
+        query: { search: search },
       });
     } catch (e) {
       setError(e);
@@ -36,9 +36,20 @@ export default function NavBar() {
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div className="hidden md:block">
-              <form className="flex" onSubmit={handleSearchSubmit}>
-                <input name="content" placeholder="J'aimerais des recettes de…" />
-                <button type="submit">Rechercher</button>
+              <form className="relative" onSubmit={handleSearchSubmit}>
+                <input
+                  name="content"
+                  type="text"
+                  className="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-1 focus:outline-green-700"
+                  placeholder="J'aimerais cuisiner..."
+                />
+
+                <button
+                  type="submit"
+                  className="absolute right-0 top-0 mt-3 mr-4 transition-opacity duration-500 opacity-100 focus-within:opacity-0"
+                >
+                  <FaSearch />
+                </button>
               </form>
 
               <div className="flex md:hidden">

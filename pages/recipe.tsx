@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { search } from '@/src/utils';
 
-export default function Home() {
+export default function Recipe() {
   const [error, setError] = useState<unknown | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [about, setAbout] = useState<string | null>(null);
+  const [detailledRecipe, setAbout] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
   const router = useRouter();
   const { recipe } = router.query;
@@ -15,7 +15,7 @@ export default function Home() {
     setFetching(typeof recipe === 'string');
     if (
       !fetching &&
-      about === null &&
+      detailledRecipe === null &&
       error === null &&
       !isLoading &&
       typeof recipe === 'string'
@@ -49,8 +49,8 @@ export default function Home() {
         <div>
           {error !== null && <div>Désolé, je n&rsquo;ai rien à proposer…</div>}
           {isLoading && <div>Je cherche une recette…</div>}
-          {about !== null && (
-            <div dangerouslySetInnerHTML={{ __html: about }} />
+          {detailledRecipe !== null && (
+            <div dangerouslySetInnerHTML={{ __html: detailledRecipe }} />
           )}
         </div>
       </main>
