@@ -1,25 +1,8 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import {search} from "@/src/utils";
 
-
-async function search(system: string, prompt: string): Promise<string> {
-    const response = await fetch("/api/completion", {
-        method: "POST",
-        body: JSON.stringify({
-            messages: [
-                {
-                    role: "system",
-                    content: system,
-                },
-                { role: "user", content: prompt },
-            ],
-            max_tokens: 1000
-        }),
-    });
-    const json = await response.json();
-    return json.content;
-}
 
 export default function Home() {
     const [error, setError] = useState<unknown | null>(null);
@@ -40,8 +23,9 @@ export default function Home() {
         ) {
             setIsLoading(true);
             search(
-                "Ecris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seuleent les étapes, commences avec un <p> tag.",
+                "Ecris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag.",
                 String(recipe),
+                1000
             )
                 .then(setAbout)
                 .catch((err) => {
@@ -64,8 +48,8 @@ export default function Home() {
             <main className="flex flex-col items-center min-h-screen">
                 <h2>Recette de :  {recipe}</h2>
                 <div>
-                    {error !== null && <div>Sorry, I havent found anything…</div>}
-                    {isLoading && <div>Reading through the books…</div>}
+                    {error !== null && <div>Désolé, je n&rsquo;ai rien à proposer…</div>}
+                    {isLoading && <div>Je cherche une recette…</div>}
                     {about !== null && (
                         <div dangerouslySetInnerHTML={{ __html: about }} />
                     )}

@@ -1,29 +1,13 @@
 import Head from 'next/head';
 import { useState, useEffect } from 'react';  // Modification: Import de useEffect
 import Router, { useRouter } from 'next/router'
-
-async function search(system: string, prompt: string): Promise<string> {
-    const response = await fetch("/api/completion", {
-        method: "POST",
-        body: JSON.stringify({
-            messages: [
-            {
-                role: "system",
-                content: system,
-            },
-            { role: "user", content: prompt },
-            ],
-            max_tokens: 100
-        }),
-    });
-    const json = await response.json();
-    return json.content;
-}
+import {search} from "@/src/utils";
 
 export async function getRecipes(content: string){
     const query = await search(
         "Donne une liste d'idées de recettes qui correspondent à la demande de l'utilisateur en ne donnant que les titres des recettes. Suis cet exemple pour mettre en page :\n - titre de la Recette 1\n - titre de la Recette 2",
-        content
+        content,
+        100
     );
     const recipes = query.split("\n").map((line) => line.replace(/ *- */g, ""))
     return recipes

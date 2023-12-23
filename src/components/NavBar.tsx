@@ -40,7 +40,7 @@ export default function NavBar() {
                 onSubmit={handleSearchSubmit}
                 >
               <input name="content" placeholder="I want recipes of…" />
-              <button type="submit">Search</button>
+              <button type="submit">Rechercher</button>
             </form>
 
               <div className="flex md:hidden">
