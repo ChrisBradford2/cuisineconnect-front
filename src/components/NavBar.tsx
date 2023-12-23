@@ -2,8 +2,8 @@ import { FaHamburger, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import useSession from '@/src/hooks/useSession';
 import useIsClient from '@/src/hooks/useIsClient';
-import { useState } from "react";
-import Router from 'next/router'
+import { useState } from 'react';
+import Router from 'next/router';
 
 export default function NavBar() {
   const session = useSession();
@@ -11,10 +11,12 @@ export default function NavBar() {
 
   const [error, setError] = useState<unknown | null>(null);
 
-  const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSearchSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const content = String(formData.get("content"));
+    const content = String(formData.get('content'));
 
     // Effacez le stockage local avant de faire une nouvelle recherche
     localStorage.removeItem('recipes');
@@ -22,7 +24,7 @@ export default function NavBar() {
     try {
       await Router.push({
         pathname: '/recipes',
-        query: { content: content }
+        query: { content: content },
       });
     } catch (e) {
       setError(e);
@@ -35,13 +37,10 @@ export default function NavBar() {
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div className="hidden md:block">
-              <form
-                className="flex"
-                onSubmit={handleSearchSubmit}
-                >
-              <input name="content" placeholder="I want recipes of…" />
-              <button type="submit">Rechercher</button>
-            </form>
+              <form className="flex" onSubmit={handleSearchSubmit}>
+                <input name="content" placeholder="J'aimerais des recettes de…" />
+                <button type="submit">Rechercher</button>
+              </form>
 
               <div className="flex md:hidden">
                 <button
