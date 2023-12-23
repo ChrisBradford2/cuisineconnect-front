@@ -2,10 +2,33 @@ import { FaHamburger, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import useSession from '@/src/hooks/useSession';
 import useIsClient from '@/src/hooks/useIsClient';
+import { useState } from 'react';
+import Router from 'next/router';
 
 export default function NavBar() {
   const session = useSession();
   const isClient = useIsClient();
+
+  const [error, setError] = useState<unknown | null>(null);
+
+  const handleSearchSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const search = String(formData.get('content'));
+
+    localStorage.removeItem('recipes');
+
+    try {
+      await Router.push({
+        pathname: '/recipes',
+        query: { search: search },
+      });
+    } catch (e) {
+      setError(e);
+    }
+  };
 
   return (
     <main>
@@ -13,11 +36,12 @@ export default function NavBar() {
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
             <div className="hidden md:block">
-              <div className="relative">
+              <form className="relative" onSubmit={handleSearchSubmit}>
                 <input
+                  name="content"
                   type="text"
                   className="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-1 focus:outline-green-700"
-                  placeholder="Search"
+                  placeholder="J'aimerais cuisiner..."
                 />
 
                 <button
@@ -26,7 +50,7 @@ export default function NavBar() {
                 >
                   <FaSearch />
                 </button>
-              </div>
+              </form>
 
               <div className="flex md:hidden">
                 <button
