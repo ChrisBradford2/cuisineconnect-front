@@ -1,13 +1,18 @@
-export async function signUp(email: string, password: string): Promise<void> {
+export async function signUp(
+  email: string,
+  password: string,
+): Promise<boolean> {
   const data = {
     email,
     password,
   };
 
-  await fetch('/api/auth/signup', {
+  const response = await fetch('/api/auth/signup', {
     body: JSON.stringify(data),
     method: 'post',
   });
+
+  return response.ok;
 }
 
 export async function signIn(email: string, password: string): Promise<string> {
