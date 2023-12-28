@@ -1,7 +1,8 @@
 import Head from 'next/head';
-import { useState, useEffect } from 'react';
-import Router, { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import { search } from '@/src/utils';
+import RecipeCard from '@/src/components/RecipeCard';
 
 export async function getRecipes(content: string) {
   const query = await search(
@@ -9,8 +10,7 @@ export async function getRecipes(content: string) {
     content,
     100,
   );
-  const recipes = query.split('\n').map((line) => line.replace(/ *- */g, ''));
-  return recipes;
+  return query.split('\n').map((line) => line.replace(/ *- */g, ''));
 }
 
 export default function Recipes() {
@@ -40,15 +40,10 @@ export default function Recipes() {
       </Head>
 
       <main className="flex flex-col items-center min-h-screen">
-        <section>
-          {recipes &&
-            recipes.map((recipe, index) => {
-              return (
-                <li key={index}>
-                  <a href={`/recipe?recipe=${recipe}`}>{recipe}</a>
-                </li>
-              );
-            })}
+        <section className="relative w-full container grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {recipes.map((recipe) => {
+            return <RecipeCard key={recipe} title={recipe} />;
+          })}
         </section>
       </main>
     </>

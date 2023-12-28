@@ -5,17 +5,21 @@ import { signIn, signUp } from '@/services/authentication';
 export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     try {
-      await signUp(email, password);
-      const token = await signIn(email, password);
+      if (await signUp(email, password)) {
+        const token = await signIn(email, password);
 
-      localStorage.setItem('token', token);
-      await router.push('/');
+        localStorage.setItem('token', token);
+        await router.push('/');
+      } else {
+        setError("Le compte n'a pas pu être créé");
+      }
     } catch (error: unknown) {
       console.error(error);
     }
@@ -51,6 +55,8 @@ export default function Register() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
+
+          {error && <p className="mt-3 text-red-600">{error}</p>}
 
           <button
             className="w-full px-6 py-3 mt-3 text-lg text-white transition-all duration-150 ease-linear bg-blue-600 rounded-lg shadow outline-none hover:bg-blue-700 hover:shadow-lg focus:outline-none"

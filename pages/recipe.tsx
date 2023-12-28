@@ -6,7 +6,7 @@ import { search } from '@/src/utils';
 export default function Recipe() {
   const [error, setError] = useState<unknown | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [detailledRecipe, setAbout] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
   const router = useRouter();
   const { recipe } = router.query;
@@ -15,21 +15,22 @@ export default function Recipe() {
     setFetching(typeof recipe === 'string');
     if (
       !fetching &&
-      detailledRecipe === null &&
+      description === null &&
       error === null &&
       !isLoading &&
       typeof recipe === 'string'
     ) {
       setIsLoading(true);
       search(
-        "Ecris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag.",
+        "Écris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag.",
         String(recipe),
         1000,
       )
-        .then(setAbout)
-        .catch((err) => {
-          setError(err);
+        .then((description) => {
+          setError(null);
+          setDescription(description);
         })
+        .catch(setError)
         .finally(() => {
           setIsLoading(false);
         });
@@ -45,12 +46,12 @@ export default function Recipe() {
       </Head>
 
       <main className="flex flex-col items-center min-h-screen">
-        <h2>Recette de : {recipe}</h2>
+        <h2 className="text-xl font-semibold">Recette de : {recipe}</h2>
         <div>
           {error !== null && <div>Désolé, je n&rsquo;ai rien à proposer…</div>}
           {isLoading && <div>Je cherche une recette…</div>}
-          {detailledRecipe !== null && (
-            <div dangerouslySetInnerHTML={{ __html: detailledRecipe }} />
+          {description !== null && (
+            <div dangerouslySetInnerHTML={{ __html: description }} />
           )}
         </div>
       </main>

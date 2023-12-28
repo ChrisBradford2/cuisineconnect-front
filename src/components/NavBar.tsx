@@ -2,7 +2,7 @@ import { FaHamburger, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import useSession from '@/src/hooks/useSession';
 import useIsClient from '@/src/hooks/useIsClient';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import Router from 'next/router';
 
 export default function NavBar() {
@@ -11,9 +11,7 @@ export default function NavBar() {
 
   const [error, setError] = useState<unknown | null>(null);
 
-  const handleSearchSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const search = String(formData.get('content'));

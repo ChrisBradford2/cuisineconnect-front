@@ -16,8 +16,10 @@ export default function useSession(): Session | null {
   const [foodPreference, setFoodPreference] = useState('');
 
   useEffect(() => {
-    if (token) {
-      getFoodPreferences(token)?.then(setFoodPreference);
+    if (typeof token === 'string') {
+      getFoodPreferences(token)
+        ?.then(setFoodPreference)
+        .catch(() => setFoodPreference(''));
     } else {
       setFoodPreference('');
     }
