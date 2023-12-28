@@ -8,6 +8,7 @@ export default function Recipe() {
   const [isLoading, setIsLoading] = useState(false);
   const [description, setDescription] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
+  const [pairings, setPairings] = useState<string[]>([]);
   const router = useRouter();
   const { recipe } = router.query;
 
@@ -37,6 +38,19 @@ export default function Recipe() {
     }
   }, [recipe]);
 
+
+  const fetchPairings = () => {
+    if (typeof recipe === 'string') {
+      search(
+        "Donne-moi des suggestions d'accompagnements pour la recette suivante. Inclure des options comme des vins, des desserts et des fromages qui se marieraient bien avec. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.",
+        String(recipe),
+        1000,
+      )
+      .then((value: string) => setPairings([value]))
+      .catch(console.error);
+    }
+  };
+
   return (
     <>
       <Head>
@@ -51,7 +65,13 @@ export default function Recipe() {
           {error !== null && <div>Désolé, je n&rsquo;ai rien à proposer…</div>}
           {isLoading && <div>Je cherche une recette…</div>}
           {description !== null && (
-            <div dangerouslySetInnerHTML={{ __html: description }} />
+            <>
+              <div dangerouslySetInnerHTML={{ __html: description }} />
+              <button onClick={fetchPairings} className="my-4 p-2 bg-blue-500 text-white rounded">Trouver des Accompagnements</button>
+              {pairings && (
+                <div dangerouslySetInnerHTML={{ __html: pairings }} />
+              )}
+            </>
           )}
         </div>
       </main>
