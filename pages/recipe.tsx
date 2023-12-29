@@ -6,6 +6,7 @@ import { search } from '@/src/utils';
 export default function Recipe() {
   const [error, setError] = useState<unknown | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPairing, setIsLoadingPairing] = useState(false);
   const [description, setDescription] = useState<string | null>(null);
   const [fetching, setFetching] = useState(false);
   const [pairings, setPairings] = useState<string[]>([]);
@@ -38,16 +39,19 @@ export default function Recipe() {
     }
   }, [recipe]);
 
-
   const fetchPairings = () => {
     if (typeof recipe === 'string') {
+      setIsLoadingPairing(true);
       search(
         "Donne-moi des suggestions d'accompagnements pour la recette suivante. Inclure des options comme des vins, des desserts et des fromages qui se marieraient bien avec. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.",
         String(recipe),
         1000,
       )
-      .then((value: string) => setPairings([value]))
-      .catch(console.error);
+        .then((value: string) => setPairings([value]))
+        .catch(setError)
+        .finally(() => {
+          setIsLoadingPairing(false);
+        });
     }
   };
 
@@ -67,9 +71,30 @@ export default function Recipe() {
           {description !== null && (
             <>
               <div dangerouslySetInnerHTML={{ __html: description }} />
-              <button onClick={fetchPairings} className="my-4 p-2 bg-blue-500 text-white rounded">Trouver des Accompagnements</button>
+              {pairings.length === 0 && (
+                <button
+                  onClick={fetchPairings}
+                  className={`my-4 p-2 bg-blue-500 text-white rounded ${
+                    pairings.length > 0 ? 'hidden' : ''
+                  }`}
+                >
+                  Trouver des accompagnements
+                </button>
+              )}
               {pairings && (
-                <div dangerouslySetInnerHTML={{ __html: pairings }} />
+                <div>
+                  {isLoadingPairing && (
+                    <div>Je cherche des accompagnements…</div>
+                  )}
+                  {pairings.map((pairing) => (
+                    <>
+                      <h3 className="text-xl font-semibold mt-8">
+                        Accompagnements
+                      </h3>
+                      <div dangerouslySetInnerHTML={{ __html: pairing }} />
+                    </>
+                  ))}
+                </div>
               )}
             </>
           )}
