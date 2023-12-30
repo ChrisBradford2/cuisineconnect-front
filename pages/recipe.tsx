@@ -87,12 +87,12 @@ export default function Recipe() {
                     <div>Je cherche des accompagnements…</div>
                   )}
                   {pairings.map((pairing) => (
-                    <>
+                    <div key={pairing}>
                       <h3 className="text-xl font-semibold mt-8">
                         Accompagnements
                       </h3>
                       <div dangerouslySetInnerHTML={{ __html: pairing }} />
-                    </>
+                    </div>
                   ))}
                 </div>
               )}
