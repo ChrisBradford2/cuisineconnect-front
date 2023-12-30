@@ -29,7 +29,7 @@ export default function NavBar() {
   };
 
   return (
-    <main>
+    <header>
       <nav className="bg-white shadow">
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
@@ -117,6 +117,6 @@ export default function NavBar() {
           </div>
         </div>
       </nav>
-    </main>
+    </header>
   );
 }

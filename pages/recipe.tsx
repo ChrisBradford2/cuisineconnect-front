@@ -36,7 +36,7 @@ export default function Recipe({ recipe, description }: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center min-h-screen">
+      <main className="flex flex-col items-center h-full">
         <h2 className="text-xl font-semibold">Recette de : {recipe}</h2>
         <div>
           {description !== null && (

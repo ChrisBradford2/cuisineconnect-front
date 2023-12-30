@@ -26,7 +26,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <div className="flex flex-col items-center justify-center h-full py-2">
       <main className="flex flex-col items-center mt-10 w-full flex-1 px-20 text-center">
         <h1 className="text-6xl font-bold">S&rsquo;inscrire</h1>
 

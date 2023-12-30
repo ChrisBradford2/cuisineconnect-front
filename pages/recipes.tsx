@@ -16,7 +16,7 @@ export default function Recipes({ recipes }: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center min-h-screen">
+      <main className="flex flex-col items-center h-full">
         <section className="relative w-full container grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe) => {
             return <RecipeCard key={recipe} title={recipe} />;
