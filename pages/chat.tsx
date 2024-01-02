@@ -32,7 +32,7 @@ export default function Chat() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center min-h-screen p-2 gap-2">
+      <main className="flex flex-col items-center p-2 gap-2 chat-height">
         <h1 className="text-xl font-semibold">Chat</h1>
         <p>Discuter avec notre chef, Michel</p>
 

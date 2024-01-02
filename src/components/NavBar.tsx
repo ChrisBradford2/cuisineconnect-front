@@ -71,11 +71,10 @@ export default function NavBar() {
             <div className="flex flex-col md:flex-row md:block -mx-2">
               <Link
                 className="px-2 py-1 text-gray-500 font-medium tracking-wide rounded-md hover:bg-green-100 hover:text-gray-700 transition-all duration-150"
-                href="/recipes"
+                href="/chat"
               >
-                Recettes
+                Chat
               </Link>
-
               {isClient && (
                 <>
                   {session ? (

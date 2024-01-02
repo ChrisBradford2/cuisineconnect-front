@@ -18,6 +18,10 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.chat-height {
+  height: calc(100vh - 64px);
+}
+
 .recipe-card {
   img {
     transition: transform 0.2s ease-in-out;
