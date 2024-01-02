@@ -2,14 +2,16 @@ import { FaHamburger, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import useSession from '@/src/hooks/useSession';
 import useIsClient from '@/src/hooks/useIsClient';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Router from 'next/router';
+import VoiceSearch from './VoiceSearch';
 
 export default function NavBar() {
   const session = useSession();
   const isClient = useIsClient();
 
   const [error, setError] = useState<unknown | null>(null);
+  const [searchText, setSearchText] = useState('');
 
   const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,18 +30,33 @@ export default function NavBar() {
     }
   };
 
+  const handleVoiceSearch = async (voiceText: string) => {
+    setSearchText(voiceText);
+    localStorage.removeItem('recipes');
+    try {
+      await Router.push({
+        pathname: '/recipes',
+        query: { search: voiceText },
+      });
+    } catch (e) {
+      setError(e);
+    }
+  };
+
   return (
     <main>
       <nav className="bg-white shadow">
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-            <div className="hidden md:block">
+            <div className="hidden md:flex">
               <form className="relative" onSubmit={handleSearchSubmit}>
                 <input
                   name="content"
                   type="text"
                   className="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-1 focus:outline-green-700"
                   placeholder="J'aimerais cuisiner..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
                 />
 
                 <button
@@ -49,7 +66,7 @@ export default function NavBar() {
                   <FaSearch />
                 </button>
               </form>
-
+              <VoiceSearch onSearch={handleVoiceSearch} />
               <div className="flex md:hidden">
                 <button
                   type="button"
