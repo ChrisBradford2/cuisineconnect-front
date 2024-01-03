@@ -12,7 +12,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center min-h-screen">
+      <main className="flex flex-col items-center h-full">
         {/* Hero image */}
         <section className="relative flex flex-col items-center justify-center w-full bg-gray-100">
           <div className="absolute inset-0 z-0 w-full h-full bg-gray-100">

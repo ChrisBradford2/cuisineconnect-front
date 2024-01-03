@@ -9,9 +9,9 @@ export default function App({
   pageProps: { session, ...pageProps },
 }: AppProps) {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <NavBar />
       <Component {...pageProps} />
-    </>
+    </div>
   );
 }

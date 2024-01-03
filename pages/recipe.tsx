@@ -1,54 +1,27 @@
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { search } from '@/src/utils';
+import { GetServerSidePropsContext } from 'next';
+import getCompletion from '@/src/getCompletion';
 
-export default function Recipe() {
-  const [error, setError] = useState<unknown | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+type Props = {
+  recipe: string;
+  description: string;
+};
+
+export default function Recipe({ recipe, description }: Props) {
   const [isLoadingPairing, setIsLoadingPairing] = useState(false);
-  const [description, setDescription] = useState<string | null>(null);
-  const [fetching, setFetching] = useState(false);
   const [pairings, setPairings] = useState<string[]>([]);
-  const router = useRouter();
-  const { recipe } = router.query;
-
-  useEffect(() => {
-    setFetching(typeof recipe === 'string');
-    if (
-      !fetching &&
-      description === null &&
-      error === null &&
-      !isLoading &&
-      typeof recipe === 'string'
-    ) {
-      setIsLoading(true);
-      search(
-        "Écris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag.",
-        String(recipe),
-        1000,
-      )
-        .then((description) => {
-          setError(null);
-          setDescription(description);
-        })
-        .catch(setError)
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [recipe]);
 
   const fetchPairings = () => {
     if (typeof recipe === 'string') {
       setIsLoadingPairing(true);
       search(
         "Donne-moi des suggestions d'accompagnements pour la recette suivante. Inclure des options comme des vins, des desserts et des fromages qui se marieraient bien avec. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.",
-        String(recipe),
+        recipe,
         1000,
       )
         .then((value: string) => setPairings([value]))
-        .catch(setError)
         .finally(() => {
           setIsLoadingPairing(false);
         });
@@ -63,11 +36,9 @@ export default function Recipe() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center min-h-screen">
+      <main className="flex flex-col items-center h-full">
         <h2 className="text-xl font-semibold">Recette de : {recipe}</h2>
         <div>
-          {error !== null && <div>Désolé, je n&rsquo;ai rien à proposer…</div>}
-          {isLoading && <div>Je cherche une recette…</div>}
           {description !== null && (
             <>
               <div dangerouslySetInnerHTML={{ __html: description }} />
@@ -102,4 +73,33 @@ export default function Recipe() {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const recipe = context.query.recipe;
+
+  if (!recipe) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const description = await getCompletion(
+    [
+      {
+        role: 'system',
+        content:
+          "Écris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag.",
+      },
+      { role: 'user', content: String(recipe) },
+    ],
+    1000,
+  );
+
+  return {
+    props: {
+      recipe,
+      description,
+    },
+  };
 }
