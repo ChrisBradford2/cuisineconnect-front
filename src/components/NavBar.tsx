@@ -2,15 +2,15 @@ import { FaHamburger, FaSearch } from 'react-icons/fa';
 import Link from 'next/link';
 import useSession from '@/src/hooks/useSession';
 import useIsClient from '@/src/hooks/useIsClient';
-import { FormEvent, useEffect, useState } from 'react';
-import Router from 'next/router';
+import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/router';
 import VoiceSearch from './VoiceSearch';
 
 export default function NavBar() {
   const session = useSession();
   const isClient = useIsClient();
+  const router = useRouter();
 
-  const [error, setError] = useState<unknown | null>(null);
   const [searchText, setSearchText] = useState('');
 
   const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -18,33 +18,22 @@ export default function NavBar() {
     const formData = new FormData(event.currentTarget);
     const search = String(formData.get('content'));
 
-    localStorage.removeItem('recipes');
-
-    try {
-      await Router.push({
-        pathname: '/recipes',
-        query: { search: search },
-      });
-    } catch (e) {
-      setError(e);
-    }
+    await router.push({
+      pathname: '/recipes',
+      query: { search: search },
+    });
   };
 
   const handleVoiceSearch = async (voiceText: string) => {
     setSearchText(voiceText);
-    localStorage.removeItem('recipes');
-    try {
-      await Router.push({
-        pathname: '/recipes',
-        query: { search: voiceText },
-      });
-    } catch (e) {
-      setError(e);
-    }
+    await router.push({
+      pathname: '/recipes',
+      query: { search: voiceText },
+    });
   };
 
   return (
-    <main>
+    <header>
       <nav className="bg-white shadow">
         <div className="container px-6 py-3 mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center">
@@ -133,6 +122,6 @@ export default function NavBar() {
           </div>
         </div>
       </nav>
-    </main>
+    </header>
   );
 }

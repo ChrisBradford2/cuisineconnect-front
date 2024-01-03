@@ -1,36 +1,13 @@
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { search } from '@/src/utils';
 import RecipeCard from '@/src/components/RecipeCard';
+import { GetServerSidePropsContext } from 'next';
+import getCompletion from '@/src/getCompletion';
 
-export async function getRecipes(content: string) {
-  const query = await search(
-    "Donne une liste d'idées de recettes qui correspondent à la demande de l'utilisateur en ne donnant que les titres des recettes. Suis cet exemple pour mettre en page :\n - titre de la Recette 1\n - titre de la Recette 2",
-    content,
-    100,
-  );
-  return query.split('\n').map((line) => line.replace(/ *- */g, ''));
-}
+type Props = {
+  recipes: string[];
+};
 
-export default function Recipes() {
-  const router = useRouter();
-  const [recipes, setRecipes] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (router.query.search) {
-      const cachedRecipes = localStorage.getItem('recipes');
-      if (cachedRecipes) {
-        setRecipes(JSON.parse(cachedRecipes));
-      } else {
-        getRecipes(String(router.query.search)).then((fetchedRecipes) => {
-          setRecipes(fetchedRecipes);
-          localStorage.setItem('recipes', JSON.stringify(fetchedRecipes));
-        });
-      }
-    }
-  }, [router.query.search]);
-
+export default function Recipes({ recipes }: Props) {
   return (
     <>
       <Head>
@@ -39,7 +16,7 @@ export default function Recipes() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center min-h-screen">
+      <main className="flex flex-col items-center h-full">
         <section className="relative w-full container grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {recipes.map((recipe) => {
             return <RecipeCard key={recipe} title={recipe} />;
@@ -48,4 +25,34 @@ export default function Recipes() {
       </main>
     </>
   );
+}
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const search = context.query.search;
+
+  if (!search) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const query = await getCompletion(
+    [
+      {
+        role: 'system',
+        content:
+          "Donne une liste d'idées de recettes qui correspondent à la demande de l'utilisateur en ne donnant que les titres des recettes. Suis cet exemple pour mettre en page :\n - titre de la Recette 1\n - titre de la Recette 2",
+      },
+      { role: 'user', content: String(search) },
+    ],
+    100,
+  );
+
+  const recipes = query.split('\n').map((line) => line.replace(/ *- */g, ''));
+
+  return {
+    props: {
+      recipes,
+    },
+  };
 }

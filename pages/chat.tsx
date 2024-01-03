@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import { useState } from 'react';
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
+import OpenAI from 'openai';
 
 export async function search(
-  messages: Array<ChatCompletionMessageParam>,
+  messages: OpenAI.Chat.ChatCompletionMessageParam[],
 ): Promise<string> {
   const response = await fetch('/api/completion', {
     method: 'POST',
@@ -16,7 +16,9 @@ export async function search(
 export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState<string>('');
-  const [messages, setMessages] = useState<Array<ChatCompletionMessageParam>>([
+  const [messages, setMessages] = useState<
+    OpenAI.Chat.ChatCompletionMessageParam[]
+  >([
     {
       content:
         'Tu es Michel, un chef étoilé 5 étoiles au guide Michelin pour 5 années consécutives. Michel aide les personnes à cuisiner des plats délicieux.',
@@ -32,7 +34,7 @@ export default function Chat() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="flex flex-col items-center p-2 gap-2 chat-height">
+      <main className="flex flex-col items-center grow p-2 gap-2">
         <h1 className="text-xl font-semibold">Chat</h1>
         <p>Discuter avec notre chef, Michel</p>
 
@@ -53,7 +55,7 @@ export default function Chat() {
             event.preventDefault();
             setIsLoading(true);
             try {
-              const newMessage: ChatCompletionMessageParam = {
+              const newMessage: OpenAI.Chat.ChatCompletionMessageParam = {
                 content: value,
                 role: 'user',
               };
@@ -70,7 +72,7 @@ export default function Chat() {
 
                 { role: 'assistant', content: response },
               ]);
-            } catch (e) {
+            } catch (error) {
               setMessages((prevState) => [
                 ...prevState,
                 {
@@ -94,6 +96,7 @@ export default function Chat() {
             }}
             disabled={isLoading}
           />
+
           <button className="px-4 py-2 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-200 transform bg-green-700 rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600">
             Envoyer
           </button>
