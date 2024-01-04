@@ -52,8 +52,12 @@ export default function Recipe({ recipe, description }: Props) {
   }
 
   const copyToClipboard = () => {
+    // Remove HTML tags and spaces
+    shoppingList.forEach((item, index) => {
+      shoppingList[index] = stripHtml(item).trim();
+    });
     navigator.clipboard.writeText(shoppingList.join('\n'));
-    console.log('copied to clipboard');
+    console.log(shoppingList.join('\n'));
     toast.success('Liste d\'épicerie copiée dans le presse-papier');
   }
 
