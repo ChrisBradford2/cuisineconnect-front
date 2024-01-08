@@ -30,7 +30,7 @@ export default function Recipes({ recipes }: Props) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const search = context.query.search;
-  const { lang } = useLanguage();
+  const lang = context.req.cookies.lang || 'fr';
 
   if (!search) {
     return {

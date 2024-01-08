@@ -184,7 +184,7 @@ export default function Recipe({ recipe, description }: Props) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const recipe = context.query.recipe;
-  const { lang } = useLanguage();
+  const lang = context.req.cookies.lang || 'fr';
 
   if (!recipe) {
     return {
