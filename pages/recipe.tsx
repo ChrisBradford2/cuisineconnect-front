@@ -117,23 +117,23 @@ export default function Recipe({ recipe, description }: Props) {
                     shoppingList.length > 0 ? 'hidden' : ''
                   }`}
                 >
-                  Trouver la liste d'épicerie
+                  Trouver la liste d&apos;épicerie
                 </button>
               )}
               {shoppingList && (
                 <div>
                   {isLoadingShoppingList && (
-                    <div>Je cherche la liste d'épicerie...</div>
+                    <div>Je cherche la liste d&apos;épicerie...</div>
                   )}
                   {shoppingList.map((item) => (
                     <div key={item}>
                       <h3 className="text-xl font-semibold mt-8">
-                        Liste d'épicerie
+                        Liste d&apos;épicerie
                       </h3>
                       <div dangerouslySetInnerHTML={{ __html: item }} />
                       <div>
                         <h4 className="text-xl font-semibold mt-8">
-                          Partagez votre liste d'épicerie
+                          Partagez votre liste d&apos;épicerie
                         </h4>
                         <div className='flex gap-4'>
                           <button
