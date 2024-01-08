@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GetServerSidePropsContext } from 'next';
 import getCompletion from '@/src/getCompletion';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 type Props = {
   recipe: string;
@@ -17,11 +18,13 @@ export default function Recipe({ recipe, description }: Props) {
   const [pairings, setPairings] = useState<string[]>([]);
   const [shoppingList, setShoppingList] = useState<string[]>([]);
 
+  const { lang } = useLanguage();
+
   const fetchPairings = () => {
     if (typeof recipe === 'string') {
       setIsLoadingPairing(true);
       search(
-        "Donne-moi des suggestions d'accompagnements pour la recette suivante. Inclure des options comme des vins, des desserts et des fromages qui se marieraient bien avec. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.",
+        `Donne-moi des suggestions d'accompagnements pour la recette suivante en langue ${lang}. Inclure des options comme des vins, des desserts et des fromages qui se marieraient bien avec. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.`,
         recipe,
         1000,
       )
@@ -36,7 +39,7 @@ export default function Recipe({ recipe, description }: Props) {
     if (typeof recipe === 'string') {
       setIsLoadingShoppingList(true);
       search(
-        "Donne-moi la liste d'épicerie pour la recette suivante, avec le poind en gramme si applicable, sinon en nombre. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.",
+        `Donne-moi la liste d'épicerie pour la recette suivante en langue ${lang}, avec le poind en gramme si applicable, sinon en nombre. Pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <ul> tag.`,
         String(recipe),
         1000,
       )
@@ -56,6 +59,7 @@ export default function Recipe({ recipe, description }: Props) {
     shoppingList.forEach((item, index) => {
       shoppingList[index] = stripHtml(item).trim();
     });
+    // Copy to clipboard
     navigator.clipboard.writeText(shoppingList.join('\n'));
     console.log(shoppingList.join('\n'));
     toast.success('Liste d\'épicerie copiée dans le presse-papier');
@@ -180,6 +184,7 @@ export default function Recipe({ recipe, description }: Props) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const recipe = context.query.recipe;
+  const lang = context.req.cookies.lang || 'fr';
 
   if (!recipe) {
     return {
@@ -192,7 +197,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       {
         role: 'system',
         content:
-          "Écris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag.",
+          `Écris les étapes d'une recette en utilisant le titre de recette suivant en format HTML, pas la peine d'écrire le titre, mets seulement les étapes, commences avec un <p> tag. En langue ${lang}.`,
       },
       { role: 'user', content: String(recipe) },
     ],

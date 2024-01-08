@@ -5,6 +5,7 @@ import useIsClient from '@/src/hooks/useIsClient';
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/router';
 import VoiceSearch from './VoiceSearch';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function NavBar() {
   const session = useSession();
@@ -12,6 +13,12 @@ export default function NavBar() {
   const router = useRouter();
 
   const [searchText, setSearchText] = useState('');
+
+  const { lang, setLang } = useLanguage();
+
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setLang(event.target.value);
+  };
 
   const handleSearchSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,6 +82,10 @@ export default function NavBar() {
             </Link>
 
             <div className="flex flex-col md:flex-row md:block -mx-2">
+            <select name="lang" id="lang" value={lang} onChange={handleLanguageChange}>
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+            </select>
               <Link
                 className="px-2 py-1 text-gray-500 font-medium tracking-wide rounded-md hover:bg-green-100 hover:text-gray-700 transition-all duration-150"
                 href="/chat"

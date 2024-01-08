@@ -23,7 +23,7 @@ const VoiceSearch = ({ onSearch }: { onSearch: (text: string) => void }) => {
         .map(result => result.transcript)
         .join('');
       recognition.stop();
-      onSearch(transcript); // Appeler la fonction de rappel avec le texte reconnu
+      onSearch(transcript);
     };
 
     recognition.onerror = (event) => {

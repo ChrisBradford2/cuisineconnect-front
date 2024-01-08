@@ -2,6 +2,7 @@ import Head from 'next/head';
 import RecipeCard from '@/src/components/RecipeCard';
 import { GetServerSidePropsContext } from 'next';
 import getCompletion from '@/src/getCompletion';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 type Props = {
   recipes: string[];
@@ -29,6 +30,7 @@ export default function Recipes({ recipes }: Props) {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const search = context.query.search;
+  const lang = context.req.cookies.lang || 'fr';
 
   if (!search) {
     return {
@@ -41,7 +43,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       {
         role: 'system',
         content:
-          "Donne une liste d'idées de recettes qui correspondent à la demande de l'utilisateur en ne donnant que les titres des recettes. Suis cet exemple pour mettre en page :\n - titre de la Recette 1\n - titre de la Recette 2",
+          `Donne une liste d'idées de recettes qui correspondent à la demande de l'utilisateur en ne donnant que les titres des recettes et en langue ${lang}. Suis cet exemple pour mettre en page :\n - titre de la Recette 1\n - titre de la Recette 2`,
       },
       { role: 'user', content: String(search) },
     ],

@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { useState } from 'react';
 import OpenAI from 'openai';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 export async function search(
   messages: OpenAI.Chat.ChatCompletionMessageParam[],
@@ -14,6 +15,8 @@ export async function search(
 }
 
 export default function Chat() {
+  const { lang } = useLanguage();
+
   const [isLoading, setIsLoading] = useState(false);
   const [value, setValue] = useState<string>('');
   const [messages, setMessages] = useState<
@@ -21,7 +24,7 @@ export default function Chat() {
   >([
     {
       content:
-        'Tu es Michel, un chef étoilé 5 étoiles au guide Michelin pour 5 années consécutives. Michel aide les personnes à cuisiner des plats délicieux.',
+        `Tu es Michel, un chef étoilé 5 étoiles au guide Michelin pour 5 années consécutives. Michel aide les personnes à cuisiner des plats délicieux. Michel parle en langue ${lang}.`,
       role: 'system',
     },
   ]);
