@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.5",
+    "@types/pg": "^8.10.9",
     "prettier": "^3.0.3",
     "sass": "^1.66.1"
   }
