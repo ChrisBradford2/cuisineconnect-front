@@ -7,6 +7,12 @@ const databaseUrl =
   process.env.DATABASE_URL ?? 'postgres://user:password@localhost:5432/db';
 const connection = new Sequelize(databaseUrl, {
   dialectModule: pg,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    }
+  }
 });
 
 const db = {
